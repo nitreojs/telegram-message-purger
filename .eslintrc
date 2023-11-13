@@ -3,10 +3,12 @@
   "parser": "@typescript-eslint/parser",
   "extends": [
     "standard",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:perfectionist/recommended-natural"
   ],
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "perfectionist"
   ],
   "rules": {
     "@typescript-eslint/no-empty-interface": "off",

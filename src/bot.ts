@@ -1,5 +1,5 @@
-import { Telegram } from 'puregram'
 import { Color, Logger } from '@starkow/logger'
+import { Telegram } from 'puregram'
 
 import { Env } from './env'
 
