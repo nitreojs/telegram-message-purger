@@ -24,7 +24,7 @@
     "padding-line-between-statements": [
       "error",
       { "blankLine": "always", "prev": ["block-like", "break", "case", "class", "const", "continue", "default", "directive", "do", "import", "export", "expression", "for", "function", "if", "iife", "let", "multiline-block-like", "multiline-const", "multiline-expression", "multiline-let", "return", "throw", "try", "while"], "next": "*" },
-      { "blankLine": "any", "prev": ["import"], "next": ["import"] }
+      { "blankLine": "any", "prev": ["import", "export", "expression", "const"], "next": ["import", "export", "expression", "const"] }
     ]
   }
 }
