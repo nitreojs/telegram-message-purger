@@ -1,9 +1,9 @@
 {
   "name": "bot-template",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "dist/bot",
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/bot",
+    "dev": "ts-node -r tsconfig-paths/register src/bot",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json"
   },
   "devDependencies": {
@@ -12,7 +12,7 @@
     "@typescript-eslint/parser": "^6.10.0",
     "eslint": "^8.53.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.2.0",
     "eslint-plugin-perfectionist": "^2.3.0",
     "eslint-plugin-promise": "^6.1.1",
