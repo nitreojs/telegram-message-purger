@@ -6,6 +6,9 @@ import { confirm, input, number, search, select } from '@inquirer/prompts'
 import { createSpinner } from 'nanospinner'
 
 import { Env } from './env'
+import { sleep, toSearchDialogs } from './utils'
+import { InnerDialog } from './types'
+import { theme } from './constants'
 
 const telegram = new TelegramClient({
   apiId: Env.TELEGRAM_API_ID,
@@ -20,34 +23,7 @@ const telegram = new TelegramClient({
   }
 })
 
-const toSearchDialogs = (dialogs: Record<string, any>[]) => dialogs.map((dialog) => {
-  const name = dialog.title as string
-
-  const additions: string[] = []
-
-  if (dialog.username) {
-    additions.push('@' + dialog.username)
-  }
-
-  if (dialog.id) {
-    additions.push(`id = ${dialog.id}`)
-  }
-
-  return {
-    name: `${Logger.color(name, Color.Magenta)} ${Logger.color(`(${additions.join(', ')})`, Color.Gray)}`,
-    value: dialog.peer
-  }
-})
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-
-const theme = {
-  style: {
-    answer: (text: string) => Logger.color(text, Color.Magenta)
-  }
-}
-
-const process = async (peer: number | string | tl.RawChat) => {
+const processDeletion = async (peer: number | string | tl.RawChat) => {
   const confirmation = await confirm({
     message: 'are you sure you want to delete all your messages in this chat?',
     default: true,
@@ -61,7 +37,6 @@ const process = async (peer: number | string | tl.RawChat) => {
   const me = await telegram.resolvePeer('me')
 
   let chatId: number
-
   let title: string
 
   if (typeof peer === 'string' || typeof peer === 'number') {
@@ -122,6 +97,71 @@ const process = async (peer: number | string | tl.RawChat) => {
   deletingSpinner.success({ text: 'done!' })
 }
 
+const processType = async (type: 'id' | 'username' | 'list') => {
+  if (type === 'list') {
+    const spinner = createSpinner('loading chats...').start()
+
+    const dialogsIterator = telegram.iterDialogs({
+      filter: {
+        groups: true
+      }
+    })
+
+    const dialogs: InnerDialog[] = []
+
+    for await (const dialog of dialogsIterator) {
+      dialogs.push({
+        title: dialog.chat.title!,
+        peer: dialog.chat.peer as tl.RawChat,
+        username: dialog.chat.username,
+        id: dialog.chat.id
+      })
+    }
+
+    spinner.success({ text: `loaded ${dialogs.length} chats` })
+
+    const peer = await search({
+      message: 'select the chat you want to delete messages from:',
+      source: async (input) => {
+        if (!input) {
+          return toSearchDialogs(dialogs)
+        }
+
+        return toSearchDialogs(dialogs).filter(dialog => dialog.name.toLowerCase().includes(input.toLowerCase()))
+      },
+      theme
+    })
+
+    return processDeletion(peer as tl.RawChat)
+  }
+  
+  if (type === 'id') {
+    const id = await number({
+      message: 'enter chat id:',
+      required: true,
+      theme
+    })
+
+    if (!id) {
+      return Logger.create('collector')('invalid id provided')
+    }
+
+    return processDeletion(id)
+  }
+  
+  if (type === 'username') {
+    const username = await input({
+      message: 'enter chat username:',
+      required: true,
+      theme
+    })
+
+    const peer = username.replace('@', '').replace(/^\/(?:https?:\/\/)?(?:www\.)?t\.me\//, '')
+
+    return processDeletion(peer)
+  }
+}
+
 const main = async () => {
   const self = await telegram.start({
     phone: () => telegram.input('phone » '),
@@ -153,59 +193,7 @@ const main = async () => {
     theme
   })
 
-  if (type === 'list') {
-    const spinner = createSpinner('loading chats...').start()
-
-    const dialogsIterator = telegram.iterDialogs({
-      filter: {
-        groups: true
-      }
-    })
-
-    const dialogs: Record<string, any>[] = []
-
-    for await (const dialog of dialogsIterator) {
-      dialogs.push({ title: dialog.chat.title, peer: dialog.chat.peer, username: dialog.chat.username, id: dialog.chat.id })
-    }
-
-    spinner.success({ text: `loaded ${dialogs.length} chats` })
-
-    const peer = await search({
-      message: 'select the chat you want to delete messages from:',
-      source: async (input) => {
-        if (!input) {
-          return toSearchDialogs(dialogs)
-        }
-
-        return toSearchDialogs(dialogs).filter(dialog => dialog.name.toLowerCase().includes(input.toLowerCase()))
-      },
-      theme
-    })
-
-    await process(peer as tl.RawChat)
-  } else if (type === 'id') {
-    const id = await number({
-      message: 'enter chat id:',
-      required: true,
-      theme
-    })
-
-    if (!id) {
-      return Logger.create('collector')('invalid id provided')
-    }
-
-    await process(id)
-  } else if (type === 'username') {
-    const username = await input({
-      message: 'enter chat username:',
-      required: true,
-      theme
-    })
-
-    const peer = username.replace('@', '').replace(/^\/(?:https?:\/\/)?(?:www\.)?t\.me\//, '')
-
-    await process(peer)
-  }
+  await processType(type)
 
   return telegram.close()
 }
