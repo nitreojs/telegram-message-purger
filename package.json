@@ -1,5 +1,5 @@
 {
-  "name": "bot-template",
+  "name": "remove-my-messages-userbot",
   "version": "0.1.0",
   "main": "dist/bot",
   "scripts": {
@@ -7,6 +7,7 @@
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json"
   },
   "devDependencies": {
+    "@types/lodash.chunk": "^4.2.9",
     "@types/node": "^20.8.10",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
@@ -22,9 +23,12 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@inquirer/prompts": "^5.3.2",
+    "@mtcute/node": "^0.16.2",
     "@starkow/logger": "^2.3.1",
     "dotenv": "^16.3.1",
     "env-var": "^7.4.1",
-    "puregram": "^2.20.0"
+    "lodash.chunk": "^4.2.0",
+    "nanospinner": "^1.1.0"
   }
 }
