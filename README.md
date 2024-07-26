@@ -24,9 +24,11 @@ yarn
 
 ## config (`.env`)
 
-log in into [my.telegram.org](https://my.telegram.org/). click on [API development tools](https://my.telegram.org/apps).
+log in into [my.telegram.org](https://my.telegram.org/). click on [API development tools](https://my.telegram.org/apps)
 
-open `.env`. paste your `App api_id` into `TELEGRAM_API_ID` and your `App api_hash` into `TELEGRAM_API_HASH`
+rename `.env.example` to `.env`.
+open `.env`.
+paste your `App api_id` into `TELEGRAM_API_ID` and your `App api_hash` into `TELEGRAM_API_HASH`
 
 ## usage
 
@@ -46,4 +48,4 @@ yarn dev
 
 ### script only detected 10k messages when i have more than 10k messages in the chat
 
-this is a telegram limitation and can not be bypassed. after first deleted 10k messages just wait a bit and start the script again.
+this is a telegram limitation and can not be bypassed. after first deleted 10k messages just wait a bit and start the script again
