@@ -1,5 +1,5 @@
 {
-  "name": "remove-my-messages-userbot",
+  "name": "telegram-message-purger",
   "version": "0.1.0",
   "main": "dist/bot",
   "scripts": {
