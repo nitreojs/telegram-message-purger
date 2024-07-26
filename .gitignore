@@ -131,3 +131,6 @@ dist
 
 # telegram sessions
 *.session
+
+# env
+.env
