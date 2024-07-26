@@ -20,10 +20,24 @@ const telegram = new TelegramClient({
   }
 })
 
-const toSearchDialogs = (dialogs: Record<string, any>[]) => dialogs.map((dialog) => ({
-  name: dialog.title as string,
-  value: dialog.peer
-}))
+const toSearchDialogs = (dialogs: Record<string, any>[]) => dialogs.map((dialog) => {
+  const name = dialog.title as string
+
+  const additions: string[] = []
+
+  if (dialog.username) {
+    additions.push('@' + dialog.username)
+  }
+
+  if (dialog.id) {
+    additions.push(`id = ${dialog.id}`)
+  }
+
+  return {
+    name: `${Logger.color(name, Color.Magenta)} ${Logger.color(`(${additions.join(', ')})`, Color.Gray)}`,
+    value: dialog.peer
+  }
+})
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -68,7 +82,7 @@ const process = async (peer: number | string | tl.RawChat) => {
 
   const markedChatId = toggleChannelIdMark(chatId)
 
-  const collectingSpinner = createSpinner(`collecting messages in ${title}...`).start()
+  const collectingSpinner = createSpinner(`collecting messages in ${Logger.color(title, Color.Magenta)}...`).start()
 
   const iterable = telegram.iterSearchMessages({
     chatId: markedChatId,
@@ -151,7 +165,7 @@ const main = async () => {
     const dialogs: Record<string, any>[] = []
 
     for await (const dialog of dialogsIterator) {
-      dialogs.push({ title: dialog.chat.title, peer: dialog.chat.peer })
+      dialogs.push({ title: dialog.chat.title, peer: dialog.chat.peer, username: dialog.chat.username, id: dialog.chat.id })
     }
 
     spinner.success({ text: `loaded ${dialogs.length} chats` })
@@ -163,7 +177,7 @@ const main = async () => {
           return toSearchDialogs(dialogs)
         }
 
-        return toSearchDialogs(dialogs.filter(dialog => dialog.title!.toLowerCase().includes(input.toLowerCase())))
+        return toSearchDialogs(dialogs).filter(dialog => dialog.name.toLowerCase().includes(input.toLowerCase()))
       },
       theme
     })
