@@ -2,9 +2,11 @@
 
 this thing is a simple script that purges all messages from a specified telegram chat
 
+powered by [mtcute](https://mtcute.dev) 🌸
+
 ## installation
 
-you are required to have node.js installed and a telegram account
+you are required to have [node.js](https://nodejs.org) installed and a [telegram](https://telegram.org) account
 
 first of all, install all dependencies:
 
